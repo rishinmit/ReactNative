@@ -69,7 +69,7 @@ const App = () => {
       console.error('Voice stop error:', error);
     }
   };
-
+// trying to figure the git sync
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <Text style={{fontSize: 20, marginBottom: 20}}>Recognized Text:</Text>
