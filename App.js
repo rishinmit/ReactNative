@@ -77,7 +77,7 @@ const App = () => {
         {recognizedText || 'No speech detected'}
       </Text>
       <Button
-        title="Start Listening bantai yaar"
+        title="Start Listening bantai yaaaar"
         onPress={startListening}
         disabled={isListening}
       />
