@@ -77,12 +77,12 @@ const App = () => {
         {recognizedText || 'No speech detected'}
       </Text>
       <Button
-        title="Start Listening bantai yaaaar"
+        title="Start Listening"
         onPress={startListening}
         disabled={isListening}
       />
       <Button
-        title="Stop Listening na"
+        title="Stop Listening"
         onPress={stopListening}
         disabled={!isListening}
       />
