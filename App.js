@@ -1,12 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import promptText from './prompt';
+import { URL } from './config';
 import {
   View,
   Text,
   Button,
   PermissionsAndroid,
   Platform,
-  FlatList,
   StyleSheet,
+  FlatList,
+  TouchableOpacity,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import axios from 'axios';
@@ -14,7 +17,8 @@ import axios from 'axios';
 const App = () => {
   const [recognizedText, setRecognizedText] = useState('');
   const [isListening, setIsListening] = useState(false);
-  const [schedule, setSchedule] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [updatingTaskId, setUpdatingTaskId] = useState(null);
 
   const requestMicrophonePermission = async () => {
     if (Platform.OS === 'android') {
@@ -41,6 +45,7 @@ const App = () => {
 
   useEffect(() => {
     requestMicrophonePermission();
+    fetchTasks();
 
     Voice.onSpeechStart = () => console.log('Speech started');
     Voice.onSpeechEnd = () => {
@@ -51,7 +56,11 @@ const App = () => {
     Voice.onSpeechResults = event => {
       const text = event.value ? event.value[0] : '';
       setRecognizedText(text);
-      generateSchedule(text);
+      if (updatingTaskId) {
+        updateTask(updatingTaskId, text);
+      } else {
+        generateSchedule(text);
+      }
       console.log('Speech Results:', text);
     };
     Voice.onSpeechError = error =>
@@ -60,12 +69,11 @@ const App = () => {
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
-  }, []);
+  }, [updatingTaskId]);
 
   const startListening = async () => {
     try {
       setRecognizedText('');
-      setSchedule([]);
       setIsListening(true);
       await Voice.start('en-IN');
     } catch (error) {
@@ -82,6 +90,105 @@ const App = () => {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(`${URL}/get-tasks`);
+      setTasks(response.data);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      console.log('Deleting task with ID:', taskId);
+      const response = await axios.delete(`${URL}/delete-task/${taskId}`);
+      console.log('Delete response:', response.data);
+      setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+    } catch (error) {
+      console.error('Error deleting task:', error.response?.data || error.message);
+    }
+  };
+
+  const startUpdatingTask = (taskId) => {
+    setUpdatingTaskId(taskId);
+    startListening();
+  };
+
+  const updateTask = async (taskId, updatedText) => {
+    try {
+      console.log('Updating task with ID:', taskId);
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: 'llama3-8b-8192',
+          messages: [
+            {
+              role: 'system',
+              content: promptText,
+            },
+            {
+              role: 'user',
+              content: `Extract schedule including date, time, and task from: "${updatedText}".`,
+            },
+          ],
+          temperature: 0.3,
+          max_tokens: 50,
+        },
+        {
+          headers: {
+            Authorization: `Bearer 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`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      
+      let rawApiResponse = response.data.choices[0]?.message?.content;
+      console.log('Raw API Response:', rawApiResponse);
+
+      const jsonMatch = rawApiResponse.match(/\[.*?\]/s);
+      if (jsonMatch) {
+        const jsonData = JSON.parse(jsonMatch[0]);
+        console.log('Extracted JSON:', jsonData);
+
+        if (jsonData.length > 0) {
+          const updateData = {};
+          if (jsonData[0].date) updateData.date = jsonData[0].date;
+          if (jsonData[0].time) updateData.time = jsonData[0].time;
+          if (jsonData[0].task) updateData.task = jsonData[0].task;
+
+          const response = await axios.put(`${URL}/update-task/${taskId}`, updateData);
+          console.log('Update response:', response.data);
+          setUpdatingTaskId(null);
+          fetchTasks();
+        } else {
+          console.error('Extracted JSON is empty');
+        }
+      } else {
+        console.error('Failed to extract JSON from API response');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error.response?.data || error.message);
+    }
+  };
+  const saveScheduleToDB = async (scheduleData) => {
+    if (!scheduleData || scheduleData.length === 0) {
+      console.error('No valid schedule data to save.');
+      return;
+    }
+  
+    try {
+      for (const item of scheduleData) {
+        const { date, time, task } = item;
+        await axios.post(`${URL}/save-task`, { date, time, task });
+      }
+      console.log('Tasks saved successfully');
+      fetchTasks(); // Refresh tasks
+    } catch (error) {
+      console.error('Error saving task:', error.response?.data || error.message);
+    }
+  };
+  
   const generateSchedule = async inputText => {
     if (!inputText) return;
 
@@ -93,20 +200,19 @@ const App = () => {
           messages: [
             {
               role: 'system',
-              content:
-                'Extract only the specific time and task from the user input. Return a valid JSON array with only one object in the format [{"time": "12:00 PM", "task": "Meeting"}]. No extra tasks.',
+              content: promptText,
             },
             {
               role: 'user',
               content: `Extract schedule from: "${inputText}".`,
             },
           ],
-          temperature: 0.3, // Keep it low to ensure precise output
+          temperature: 0.3,
           max_tokens: 50,
         },
         {
           headers: {
-            Authorization: `Bearer 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`, // Replace with your API key
+            Authorization: `Bearer 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`,
             'Content-Type': 'application/json',
           },
         },
@@ -115,63 +221,57 @@ const App = () => {
       let rawApiResponse = response.data.choices[0]?.message?.content;
       console.log('Raw API Response:', rawApiResponse);
 
-      // Extract only the JSON part from response
-      const jsonMatch = rawApiResponse.match(/\[.*\]/s);
+      const jsonMatch = rawApiResponse.match(/\[.*?\]/s);
       if (jsonMatch) {
-        const jsonData = JSON.parse(jsonMatch[0]); // Parse only JSON
-        setSchedule(jsonData);
+        const jsonData = JSON.parse(jsonMatch[0]);
+        console.log('Extracted JSON:', jsonData);
+
+        if (jsonData.length > 0) {
+          saveScheduleToDB(jsonData);
+        } else {
+          console.error('Extracted JSON is empty');
+        }
       } else {
-        console.error('Failed to extract JSON');
-        setSchedule([]);
+        console.error('Failed to extract JSON from API response');
       }
     } catch (error) {
-      console.error(
-        'Error generating schedule:',
-        error.response?.data || error.message,
-      );
-      setSchedule([]);
+      console.error('Error generating schedule:', error.response?.data || error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AI-Powered Daily Schedule</Text>
-
+      <Text style={styles.title}>AI-Powered Speech Recognition</Text>
       <Text style={styles.label}>Recognized Text:</Text>
-      <Text style={styles.recognizedText}>
-        {recognizedText || 'No speech detected'}
-      </Text>
+      <Text style={styles.recognizedText}>{recognizedText || 'No speech detected'}</Text>
 
-      <Button
-        title="🎤 Start Listening"
-        onPress={startListening}
-        disabled={isListening}
-      />
-      <Button
-        title="🛑 Stop Listening"
-        onPress={stopListening}
-        disabled={!isListening}
-      />
+      <View style={styles.buttonContainer}>
+        <Button title="🎤 Start Listening" onPress={startListening} disabled={isListening} />
+        <Button title="🛑 Stop Listening" onPress={stopListening} disabled={!isListening} />
+      </View>
 
-      {schedule.length > 0 && (
-        <View style={styles.tableContainer}>
-          <Text style={styles.tableTitle}>Generated Schedule:</Text>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderCell}>Time</Text>
-            <Text style={styles.tableHeaderCell}>Task</Text>
+      {/* <Text style={styles.title}>📅 Schedule</Text> */}
+
+      <FlatList
+        data={tasks}
+        keyExtractor={(item) => item._id}
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item }) => (
+          <View style={styles.taskItem}>
+            <Text style={styles.taskText}>{item.date} - {item.time}: {item.task}</Text>
+
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => deleteTask(item._id)}>
+                <Text style={styles.buttonText}>Delete</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.updateButton} onPress={() => startUpdatingTask(item._id)}>
+                <Text style={styles.buttonText}>Update</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <FlatList
-            data={schedule}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => (
-              <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>{item.time}</Text>
-                <Text style={styles.tableCell}>{item.task}</Text>
-              </View>
-            )}
-          />
-        </View>
-      )}
+        )}
+      />
     </View>
   );
 };
@@ -186,51 +286,66 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 25,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginTop: 20,
+    color: '#333',
   },
   label: {
     fontSize: 20,
     marginBottom: 10,
+    color: 'red',
   },
   recognizedText: {
     fontSize: 18,
-    color: 'blue',
+    color: 'pink',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
     marginBottom: 20,
   },
-  tableContainer: {
-    marginTop: 20,
-    width: '100%',
-    padding: 10,
-    backgroundColor: 'black',
+  taskItem: {
+    backgroundColor: 'blue',
+    padding: 15,
+    marginVertical: 8,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    width: '100%',
   },
-  tableTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: 'black',
-    padding: 10,
-  },
-  tableHeaderCell: {
-    flex: 1,
+  taskText: {
     fontSize: 16,
+    color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center',
   },
-  tableRow: {
+  buttonGroup: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    padding: 10,
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
-  tableCell: {
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
     flex: 1,
-    fontSize: 16,
-    textAlign: 'center',
+    marginRight: 5,
+  },
+  updateButton: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    flex: 1,
+    marginLeft: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
