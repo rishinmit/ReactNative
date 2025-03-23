@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   taskItem: {
-    backgroundColor: 'blue',
+    backgroundColor: 'black',
     padding: 15,
     marginVertical: 8,
     borderRadius: 10,
