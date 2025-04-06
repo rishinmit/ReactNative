@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import Voice from '@react-native-voice/voice';
 import axios from 'axios';
 import promptText from '../prompt';
-import {URL} from '../config';
+import {URL, API_KEY, API_LINK} from '../config';
 import {PermissionsAndroid, Platform} from 'react-native';
 
 const useSpeechHandler = () => {
@@ -95,7 +95,7 @@ const useSpeechHandler = () => {
   const updateTask = async (id, text) => {
     try {
       const res = await axios.post(
-        'https://api.groq.com/openai/v1/chat/completions',
+        API_LINK,
         {
           model: 'llama3-8b-8192',
           messages: [
@@ -110,7 +110,7 @@ const useSpeechHandler = () => {
         },
         {
           headers: {
-            Authorization: `Bearer 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`,
+            Authorization: `Bearer ${API_KEY}`,
             'Content-Type': 'application/json',
           },
         },
@@ -140,7 +140,7 @@ const useSpeechHandler = () => {
     if (!text) return;
     try {
       const res = await axios.post(
-        'https://api.groq.com/openai/v1/chat/completions',
+        API_LINK,
         {
           model: 'llama3-8b-8192',
           messages: [
@@ -152,7 +152,7 @@ const useSpeechHandler = () => {
         },
         {
           headers: {
-            Authorization: `Bearer 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`,
+            Authorization: `Bearer ${API_KEY}`,
             'Content-Type': 'application/json',
           },
         },
