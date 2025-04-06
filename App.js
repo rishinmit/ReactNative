@@ -8,6 +8,9 @@ import {SpeechProvider} from './components/SpeechContext';
 
 const Tab = createBottomTabNavigator();
 
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(); // kept only for prototype demo by rishi
+
 const App = () => {
   return (
     <SpeechProvider>
