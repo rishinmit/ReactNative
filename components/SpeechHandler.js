@@ -1,7 +1,8 @@
 import {useState, useEffect} from 'react';
 import Voice from '@react-native-voice/voice';
 import axios from 'axios';
-import promptText from '../prompt';
+// import promptText from '../prompt';
+import getFormattedPrompt from '../prompt';
 import {URL, API_KEY, API_LINK} from '../config';
 import {PermissionsAndroid, Platform} from 'react-native';
 
@@ -99,7 +100,7 @@ const useSpeechHandler = () => {
         {
           model: 'llama3-8b-8192',
           messages: [
-            {role: 'system', content: promptText},
+            {role: 'system', content: getFormattedPrompt()},
             {
               role: 'user',
               content: `Extract schedule including date, time, and task from: "${text}".`,
@@ -144,7 +145,7 @@ const useSpeechHandler = () => {
         {
           model: 'llama3-8b-8192',
           messages: [
-            {role: 'system', content: promptText},
+            {role: 'system', content: getFormattedPrompt()},
             {role: 'user', content: `Extract schedule from: "${text}".`},
           ],
           temperature: 0.3,
