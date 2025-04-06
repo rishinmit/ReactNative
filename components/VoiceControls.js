@@ -1,27 +1,47 @@
 import React from 'react';
-import {View, Button, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 const VoiceControls = ({isListening, onStart, onStop}) => (
-  <View style={styles.buttonContainer}>
-    <Button
-      title="🎤 Start Listening"
-      onPress={onStart}
-      disabled={isListening}
-    />
-    <Button
-      title="🛑 Stop Listening"
-      onPress={onStop}
-      disabled={!isListening}
-    />
+  <View style={styles.container}>
+    {!isListening ? (
+      <TouchableOpacity style={[styles.button, styles.start]} onPress={onStart}>
+        <Text style={styles.text}>🎤 Start Listening</Text>
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity style={[styles.button, styles.stop]} onPress={onStop}>
+        <Text style={styles.text}>🛑 Stop Listening</Text>
+      </TouchableOpacity>
+    )}
   </View>
 );
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 20,
+  container: {
+    marginVertical: 20,
+    alignItems: 'center',
+  },
+  button: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 30,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: {width: 0, height: 3},
+    width: 250,
+    alignItems: 'center',
+  },
+  start: {
+    backgroundColor: '#28a745', 
+  },
+  stop: {
+    backgroundColor: '#dc3545', 
+  },
+  text: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
 
