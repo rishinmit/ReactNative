@@ -90,9 +90,11 @@ const useSpeechHandler = () => {
 
   const startUpdatingTask = id => {
     setUpdatingTaskId(id);
-    startListening();
+    setTimeout(() => {
+      startListening();
+    }, 50);
   };
-
+  
   const updateTask = async (id, text) => {
     try {
       const res = await axios.post(
