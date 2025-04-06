@@ -1,12 +1,10 @@
-// prompt.js
-
 const getFormattedPrompt = () => {
   const today = new Date();
   const formattedToday = today.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-  }); // e.g., "07 April 2025"
+  }); 
 
   return `
 TODAY'S DATE: ${formattedToday}
