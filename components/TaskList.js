@@ -133,10 +133,12 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 360,
     alignSelf: 'center',
+    borderWidth: 2,
   },
   taskCardDone: {
-    backgroundColor: '#1e293b',
-    borderColor: '#475569',
+    backgroundColor: '#000000',  
+    borderColor: '#22c55e',      
+    borderWidth: 2,
   },
   taskDateTime: {
     color: '#0284c7',
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   cancelButton: {
-    backgroundColor: '#94a3b8',
+    backgroundColor: 'blue',
   },
   confirmButton: {
     backgroundColor: '#ef4444',
