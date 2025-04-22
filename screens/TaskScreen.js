@@ -10,7 +10,7 @@ const TaskScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#e3f2fd" />
 
-      <Text style={styles.header}>📋 Your Tasks</Text>
+      <Text style={styles.header}>YOUR TASKS</Text>
 
       <View style={styles.taskListWrapper}>
         <TaskList
