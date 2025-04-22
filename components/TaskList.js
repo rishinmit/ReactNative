@@ -29,20 +29,22 @@ const TaskList = ({ tasks, onDelete, onUpdate }) => {
         data={tasks}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.container}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const isDone = doneTasks.includes(item._id);
 
           return (
             <View style={[styles.taskCard, isDone && styles.taskCardDone]}>
+              <Text style={styles.taskNumber}>
+                {index + 1}
+              </Text>
               <Text style={styles.taskDateTime}>
                 📅 {item.date} ‧ ⏰ {item.time}
               </Text>
-
               <Text
                 style={[
                   styles.taskDescription,
                   isDone && {
-                    color: '#f1f5f9',
+                    color: 'green',
                     textDecorationLine: 'line-through',
                   },
                 ]}
@@ -120,93 +122,100 @@ const TaskList = ({ tasks, onDelete, onUpdate }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 20,
-    paddingHorizontal: 10,
+    paddingBottom: 24,
+    paddingHorizontal: 12,
+    backgroundColor: '#f8fafc',
   },
   taskCard: {
-    backgroundColor: '#f0f9ff',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 14,
-    borderWidth: 1.2,
-    borderColor: '#38bdf8',
+    backgroundColor: '#ffffff',
+    padding: 20,
+    marginVertical: 10,
+    borderRadius: 18,
+    borderColor: 'skyblue',
+    borderWidth: 1.5,
     width: '100%',
     maxWidth: 360,
     alignSelf: 'center',
-    borderWidth: 2,
   },
   taskCardDone: {
-    backgroundColor: '#000000',  
-    borderColor: '#22c55e',      
+    backgroundColor: '#ecfdf5', 
+    borderColor: '#4ade80', 
     borderWidth: 2,
   },
+  taskNumber: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0ea5e9',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontFamily: 'System',
+  },
   taskDateTime: {
-    color: '#0284c7',
-    fontSize: 15,
-    fontWeight: '600',
+    color: '#0891b2',
+    fontSize: 16,
+    fontWeight: '500',
     marginBottom: 6,
+    textAlign: 'center',
   },
   taskDescription: {
     color: '#0f172a',
-    fontSize: 17,
+    fontSize: 18,
+    textAlign: 'center',
     fontWeight: '600',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 8,
   },
   deleteButton: {
     backgroundColor: '#ef4444',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingVertical: 10,
+    borderRadius: 10,
     flex: 1,
   },
   doneButton: {
-    backgroundColor: 'green',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    borderRadius: 10,
     flex: 1,
-    marginRight: 8,
   },
   updateButton: {
-    backgroundColor: '#f59e0b',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    backgroundColor: '#facc15',
+    paddingVertical: 10,
+    borderRadius: 10,
     flex: 1,
-    marginRight: 8,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#ffffff',
+    fontWeight: '600',
     textAlign: 'center',
+    fontSize: 15,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   modalView: {
-    backgroundColor: '#fff',
-    padding: 24,
+    backgroundColor: '#ffffff',
+    padding: 28,
     borderRadius: 20,
     alignItems: 'center',
     elevation: 5,
-    width: 300,
+    width: 320,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 10,
     color: '#1e293b',
   },
   modalMessage: {
     fontSize: 16,
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
     color: '#475569',
   },
@@ -214,25 +223,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    gap: 10,
   },
   modalButton: {
     flex: 1,
-    paddingVertical: 10,
-    marginHorizontal: 5,
+    paddingVertical: 12,
     borderRadius: 10,
   },
   cancelButton: {
-    backgroundColor: 'blue',
+    backgroundColor: '#3b82f6',
   },
   confirmButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#dc2626',
   },
   modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#ffffff',
+    fontWeight: '600',
     textAlign: 'center',
     fontSize: 16,
   },
 });
+
 
 export default TaskList;

@@ -31,38 +31,44 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e3f2fd', 
-    padding: 20,
+    backgroundColor: '#e3f2fd',
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: '#0ea5e9', 
-    marginBottom: 40,
+    color: '#0ea5e9',
+    marginBottom: 36,
     textAlign: 'center',
+    fontFamily: 'System',
   },
   recognitionBox: {
     backgroundColor: '#ffffff',
-    padding: 22,
-    borderRadius: 18,
+    padding: 24,
+    borderRadius: 20,
     width: '100%',
-    borderWidth: 1.5,
-    borderColor: '#7c4dff', 
-    marginBottom: 40,
+    maxWidth: 380,
+    borderWidth: 2,
+    borderColor: '#7c4dff',
+    marginBottom: 36,
   },
   label: {
     fontSize: 18,
-    color: '#7c4dff', 
+    color: '#7c4dff',
     fontWeight: '600',
     marginBottom: 10,
+    fontFamily: 'System',
   },
   recognizedText: {
     fontSize: 20,
     color: '#1e293b', 
     fontWeight: '500',
+    fontFamily: 'System',
   },
 });
+
+
 
 export default HomeScreen;

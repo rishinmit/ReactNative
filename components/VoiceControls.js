@@ -17,31 +17,34 @@ const VoiceControls = ({isListening, onStart, onStop}) => (
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 20,
+    marginVertical: 24,
     alignItems: 'center',
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 300,
-    elevation: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 36,
+    borderRadius: 999,
+    backgroundColor: '#22c55e', 
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: {width: 0, height: 3},
-    width: 250,
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    width: 260,
     alignItems: 'center',
+    elevation: 6,
   },
   start: {
     backgroundColor: '#28a745', 
   },
   stop: {
-    backgroundColor: '#dc3545', 
+    backgroundColor: '#1e293b', 
   },
   text: {
-    color: '#fff',
+    color: '#ffffff',
     fontWeight: '600',
-    fontSize: 20,
+    fontSize: 18,
+    fontFamily: 'System',
+    letterSpacing: 1,
   },
 });
 
