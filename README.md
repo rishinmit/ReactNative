@@ -1,3 +1,4 @@
+Backend deployed on Render, repo link: https://github.com/rishinmit/TaskRecoBack
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
